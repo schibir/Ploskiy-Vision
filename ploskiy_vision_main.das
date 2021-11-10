@@ -5,12 +5,18 @@ options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
 
 var level : array<array<uint>>
+var player : float2
+
+def DrawPlayer()
+    let pos : float2 = CoordToPos(player[0], player[1]);
+    DrawTile(pos[0], pos[1], 0xFFABAD0F)
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
 def initialize
     set_window_title("Ploskiy Vision")
     level <- LoadLevel(0)
+    player = float2(ParsePlayerPos(0))
     return
 
 // this function is called to update game data,
@@ -25,4 +31,5 @@ def act(dt: float)
 [export]
 def draw
     DrawLevel(level)
+    DrawPlayer()
     return

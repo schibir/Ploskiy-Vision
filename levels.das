@@ -5,16 +5,19 @@ let levels_src: array<array<string>> <- [{auto
 
 [{auto
     "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO";
-    "O                                         O";
+    "O                        O                O";
+    "O                        O                O";
     "O                                         O";
     "O                X              ~         O";
     "O                X            OOOOOOO     O";
     "O                X                        O";
-    "O                                 O       O";
+    "O      ~  @                       O       O";
     "O     OOOOOO                      O       O";
     "O                                 O       O";
     "O                                 O       O";
-    "O                @                        O";
+    "O                                 O       O";
+    "O                                 O       O";
+    "O                                         O";
     "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
 }]
 
@@ -42,6 +45,11 @@ def LoadLevel(level: int)
     }]
     return <- level_arr
 
+def ParsePlayerPos(level: int)
+    let y = find_index_if(levels_src[level]) <| $(row) { return find(row, '@') >= 0; }
+    let x = find(levels_src[level][y], '@')
+    return <- int2(x, y)
+
 def LevelDim(level)
     return <- int2(length(level), length(level[0]))
 
@@ -49,6 +57,10 @@ def DrawLevel(level)
     let level_dim <- LevelDim(level)
     for row, y in level, range(level_dim[0])
         for cell, x in row, range(level_dim[1])
-            let pos : int2 = int2((TILE_SIZE - BORDER_SIZE) * x, (TILE_SIZE - BORDER_SIZE) * y);
+            let pos = CoordToPos(x, y);
             if (cell == WALL)
-                DrawTile(pos[0], pos[1], 0xff7845ff)
+                DrawTile(pos[0], pos[1], 0xFF718B8F)
+            elif (cell == LAVA)
+                DrawTile(pos[0], pos[1], 0xFFCF1A09)
+            elif (cell == EXIT)
+                DrawFrame(pos[0], pos[1], 0xFF672DEE)
