@@ -26,11 +26,20 @@ def DrawQuadWithBorder(x, y, size, r: float; color: uint; border: float; border_
     DrawSmoothQuadFrame(x, y, size, r, border_color)
     DrawSmoothQuad(x + border, y + border, size - 2.0 * border, r - border, color)
 
-def DrawTile(x, y: float; color: uint)
-    DrawQuadWithBorder(x, y, TILE_SIZE, TILE_SIZE / 10.0, color, BORDER_SIZE, 0xFFB9BEB9)
+def ToScreenSpace(v: auto)
+    return float((TILE_SIZE - BORDER_SIZE) * float(v))
 
-def DrawFrame(x, y: float; color: uint)
-    DrawSmoothQuadFrame(x, y, TILE_SIZE, TILE_SIZE / 10.0, color)
+def PosToCoord(x, y: auto)
+    return float2(ToScreenSpace(x), ToScreenSpace(y));
 
-def CoordToPos(x, y: auto)
-    return float2((TILE_SIZE - BORDER_SIZE) * float(x), (TILE_SIZE - BORDER_SIZE) * float(y));
+def DrawTile(x, y: auto; color: uint)
+    let coord = PosToCoord(x, y)
+    DrawQuadWithBorder(coord[0], coord[1], TILE_SIZE, TILE_SIZE / 10.0, color, BORDER_SIZE, 0xFFB9BEB9)
+
+def DrawFrame(x, y: auto; color: uint)
+    let coord = PosToCoord(x, y)
+    DrawSmoothQuadFrame(coord[0], coord[1], TILE_SIZE, TILE_SIZE / 10.0, color)
+
+def DrawCircle(x, y, r: float; color: uint)
+    let coord = PosToCoord(x, y)
+    fill_circle(coord[0], coord[1], ToScreenSpace(r), color)

@@ -8,8 +8,9 @@ var level : array<array<uint>>
 var player : float2
 
 def DrawPlayer()
-    let pos : float2 = CoordToPos(player[0], player[1]);
-    DrawTile(pos[0], pos[1], 0xFFABAD0F)
+    DrawTile(player[0], player[1], 0xFF869409)
+    DrawCircle(player[0] + 1.0 / 3.0, player[1] + 1.0 / 3.0, 1.0 / 10.0, 0xffffffff)
+    DrawCircle(player[0] + 2.0 / 3.0, player[1] + 1.0 / 3.0, 1.0 / 10.0, 0xffffffff)
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
