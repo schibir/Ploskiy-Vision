@@ -4,7 +4,6 @@ require drawing
 options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
 
-var level : array<array<uint>>
 var player : float2
 
 let PLAYER_SPEED = 4.0
@@ -18,9 +17,8 @@ def DrawPlayer()
 [export]
 def initialize
     set_window_title("Ploskiy Vision")
-    level <- LoadLevel(0)
-    player = float2(ParsePlayerPos(0))
-    return
+    LoadLevel(0)
+    player = float2(start_pos)
 
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
@@ -41,6 +39,6 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
-    DrawLevel(level)
+    DrawLevel()
     DrawPlayer()
     return
