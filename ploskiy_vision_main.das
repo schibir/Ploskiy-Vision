@@ -1,12 +1,15 @@
 require daslib/media
-require levels
+require level
 require drawing
 options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
 
 var player : float2
+var player_vertical_vel : float
 
 let PLAYER_SPEED = 4.0
+let PLAYER_JUMP = 7.3
+let GRAVITY = 5.5
 
 def DrawPlayer()
     DrawTile(player[0], player[1], 0xFF869409)
@@ -26,14 +29,23 @@ def initialize
 def act(dt: float)
     if get_key(VK_ESCAPE)
         schedule_quit_game()
+    var horizontal_vel : float
     if get_key(VK_LEFT)
-        player[0] -= PLAYER_SPEED * dt
+        horizontal_vel = -PLAYER_SPEED
     if get_key(VK_RIGHT)
-        player[0] += PLAYER_SPEED * dt
-    if get_key(VK_UP)
-        player[1] -= PLAYER_SPEED * dt
-    if get_key(VK_DOWN)
-        player[1] += PLAYER_SPEED * dt
+        horizontal_vel = PLAYER_SPEED
+    if get_key_down(VK_UP)
+        player_vertical_vel = -PLAYER_JUMP
+    player_vertical_vel += GRAVITY * dt
+
+    player[1] += player_vertical_vel * dt;
+    if ((CheckCollision(player) & WALL) == WALL)
+        player[1] -= player_vertical_vel * dt
+        player_vertical_vel = 0.0
+
+    player[0] += horizontal_vel * dt;
+    if ((CheckCollision(player) & WALL) == WALL)
+        player[0] -= horizontal_vel * dt
 
 // this function will be called every frame after 'act',
 // you can draw anything in this function

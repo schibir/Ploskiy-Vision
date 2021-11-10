@@ -23,10 +23,10 @@ let levels_src: array<array<string>> <- [{auto
 }];
 
 let EMPTY = 0u
-let WALL = 1u
-let LAVA = 2u
-let START = 3u
-let EXIT = 4u
+let START = 1u
+let WALL = 2u
+let LAVA = 4u
+let EXIT = 8u
 let UNEXPECTED = 255u
 
 var current_level : array<array<uint>>
@@ -62,10 +62,16 @@ def DrawLevel()
             elif (cell == EXIT)
                 DrawFrame(x, y, 0xFF672DEE)
 
-// def CheckCollision(x, y: float)
-//     let int_x = int(x)
-//     let int_y = int(y)
-//     let tile = 
+def GetTile(x, y: float)
+    let int_x = int(x)
+    let int_y = int(y)
+    let tile = current_level[int_y][int_x]
+    return tile
 
-// def CheckCollision(tile: float2)
-
+def CheckCollision(coord: float2)
+    var tile : uint
+    tile |= GetTile(coord[0] + 0.01, coord[1] + 0.01)
+    tile |= GetTile(coord[0] + 0.99, coord[1] + 0.01)
+    tile |= GetTile(coord[0] + 0.01, coord[1] + 0.99)
+    tile |= GetTile(coord[0] + 0.99, coord[1] + 0.99)
+    return tile
