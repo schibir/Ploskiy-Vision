@@ -1,4 +1,5 @@
 require strings
+require drawing
 
 let levels_src: array<array<string>> <- [{auto
 
@@ -40,3 +41,14 @@ def LoadLevel(level: int)
         }]
     }]
     return <- level_arr
+
+def LevelDim(level)
+    return <- int2(length(level), length(level[0]))
+
+def DrawLevel(level)
+    let level_dim <- LevelDim(level)
+    for row, y in level, range(level_dim[0])
+        for cell, x in row, range(level_dim[1])
+            let pos : int2 = int2((TILE_SIZE - BORDER_SIZE) * x, (TILE_SIZE - BORDER_SIZE) * y);
+            if (cell == WALL)
+                DrawTile(pos[0], pos[1], 0xff7845ff)

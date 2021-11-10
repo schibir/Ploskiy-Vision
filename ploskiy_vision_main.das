@@ -4,10 +4,13 @@ require drawing
 options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
 
+var level : array<array<uint>>
+
 // 'initialize' runs once when game starts and every hot-reload
 [export]
 def initialize
     set_window_title("Ploskiy Vision")
+    level <- LoadLevel(0)
     return
 
 // this function is called to update game data,
@@ -21,6 +24,5 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
-    DrawTile(400, 400, 0xff7845ff)
-    DrawTile(400 + TILE_SIZE - BORDER_SIZE, 400, 0xff7845ff)
+    DrawLevel(level)
     return
