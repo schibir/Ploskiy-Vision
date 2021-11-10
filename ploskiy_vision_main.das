@@ -1,6 +1,10 @@
 require daslib/media
 options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
+require levels
+
+let TILE_SIZE = 50
+let BORDER_SIZE = 2
 
 def draw_smooth_quad_frame(x: int; y: int; w: int; r: int; color: uint)
     for i in range(2)
@@ -25,6 +29,9 @@ def draw_quad_with_border(x: int; y: int; size: int; r: int; color: uint; border
     draw_smooth_quad_frame(x, y, size, r, border_color)
     draw_smooth_quad(x + border, y + border, size - 2 * border, r - border, color)
 
+def draw_tile(x: int; y: int; color: uint)
+    draw_quad_with_border(x, y, TILE_SIZE, TILE_SIZE / 10, color, BORDER_SIZE, 0xff89ff90)
+
 // 'initialize' runs once when game starts and every hot-reload
 [export]
 def initialize
@@ -42,6 +49,6 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
-    draw_smooth_quad(10, 10, 100, 10, 0xff7845ff)
-    draw_quad_with_border(400, 400, 100, 10, 0xff7845ff, 4, 0x2389ff90)
+    draw_tile(400, 400, 0xff7845ff)
+    draw_tile(400 + TILE_SIZE - BORDER_SIZE, 400, 0xff7845ff)
     return
