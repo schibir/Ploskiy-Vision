@@ -7,6 +7,7 @@ require daslib/debug        // uncomment for debug in VS Code
 var player : float2
 var player_vertical_vel : float
 var jump_timer : float
+var last_move_to_left : bool
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
@@ -14,8 +15,10 @@ let GRAVITY = 6.0
 
 def DrawPlayer()
     DrawTile(player[0], player[1], 0xFF869409)
-    DrawCircle(player[0] + 1.0 / 3.0, player[1] + 1.0 / 3.0, 1.0 / 10.0, 0xffffffff)
-    DrawCircle(player[0] + 2.0 / 3.0, player[1] + 1.0 / 3.0, 1.0 / 10.0, 0xffffffff)
+    let dx = last_move_to_left ? -0.15 : 0.15
+    let dy = player_vertical_vel * 0.02
+    DrawCircle(player[0] + 1.0 / 3.0 + dx, player[1] + 1.0 / 3.0 + dy, 1.0 / 10.0, 0xffffffff)
+    DrawCircle(player[0] + 2.0 / 3.0 + dx, player[1] + 1.0 / 3.0 + dy, 1.0 / 10.0, 0xffffffff)
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
@@ -33,8 +36,10 @@ def act(dt: float)
     var horizontal_vel : float
     if get_key(VK_LEFT)
         horizontal_vel = -PLAYER_SPEED
+        last_move_to_left = true
     if get_key(VK_RIGHT)
         horizontal_vel = PLAYER_SPEED
+        last_move_to_left = false
     if get_key_down(VK_UP) && jump_timer > 0.0
         player_vertical_vel = -PLAYER_JUMP
     player_vertical_vel += GRAVITY * dt
