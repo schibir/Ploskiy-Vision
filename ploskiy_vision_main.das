@@ -6,6 +6,7 @@ require daslib/debug        // uncomment for debug in VS Code
 
 var player : float2
 var player_vertical_vel : float
+var jump_timer : float
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.3
@@ -34,14 +35,16 @@ def act(dt: float)
         horizontal_vel = -PLAYER_SPEED
     if get_key(VK_RIGHT)
         horizontal_vel = PLAYER_SPEED
-    if get_key_down(VK_UP)
+    if get_key_down(VK_UP) && jump_timer > 0.0
         player_vertical_vel = -PLAYER_JUMP
     player_vertical_vel += GRAVITY * dt
 
+    jump_timer -= dt
     player[1] += player_vertical_vel * dt;
     if ((CheckCollision(player) & WALL) == WALL)
         player[1] -= player_vertical_vel * dt
         player_vertical_vel = 0.0
+        jump_timer = 0.5
 
     player[0] += horizontal_vel * dt;
     if ((CheckCollision(player) & WALL) == WALL)
