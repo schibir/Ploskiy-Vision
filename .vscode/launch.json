@@ -8,7 +8,7 @@
             "type": "dascript",
             "request": "launch",
             "name": "daScript: launch",
-            "program": "${config:dascript.compiler} ${file}",
+            "program": "${config:dascript.compiler} ploskiy_vision_main.das",
             "cwd": "${fileDirname}"
         },
         {

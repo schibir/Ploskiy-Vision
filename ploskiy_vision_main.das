@@ -6,7 +6,7 @@ require levels
 let TILE_SIZE = 50
 let BORDER_SIZE = 2
 
-def draw_smooth_quad_frame(x: int; y: int; w: int; r: int; color: uint)
+def DrawSmoothQuadFrame(x: int; y: int; w: int; r: int; color: uint)
     for i in range(2)
         for j in range(2)
             let corner_x = x + w * i + r - 2 * r * i
@@ -19,18 +19,18 @@ def draw_smooth_quad_frame(x: int; y: int; w: int; r: int; color: uint)
     fill_rect(x, y + r , r, w - 2 * r, color)
     fill_rect(x + w - r, y + r, r, w - 2 * r, color)
 
-def draw_smooth_quad(x: int; y: int; w: int; r: int; color: uint)
-    draw_smooth_quad_frame(x, y, w, r, color)
+def DrawSmoothQuad(x: int; y: int; w: int; r: int; color: uint)
+    DrawSmoothQuadFrame(x, y, w, r, color)
     // fill inside
     fill_rect(x + r, y + r, w - 2 * r, w - 2 * r, color)
 
-def draw_quad_with_border(x: int; y: int; size: int; r: int; color: uint; border: int; border_color: uint)
+def DrawQuadWithBorder(x: int; y: int; size: int; r: int; color: uint; border: int; border_color: uint)
     assert(border < r, "Border should be less then radius")
-    draw_smooth_quad_frame(x, y, size, r, border_color)
-    draw_smooth_quad(x + border, y + border, size - 2 * border, r - border, color)
+    DrawSmoothQuadFrame(x, y, size, r, border_color)
+    DrawSmoothQuad(x + border, y + border, size - 2 * border, r - border, color)
 
-def draw_tile(x: int; y: int; color: uint)
-    draw_quad_with_border(x, y, TILE_SIZE, TILE_SIZE / 10, color, BORDER_SIZE, 0xff89ff90)
+def DrawTile(x: int; y: int; color: uint)
+    DrawQuadWithBorder(x, y, TILE_SIZE, TILE_SIZE / 10, color, BORDER_SIZE, 0xff89ff90)
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
@@ -49,6 +49,6 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
-    draw_tile(400, 400, 0xff7845ff)
-    draw_tile(400 + TILE_SIZE - BORDER_SIZE, 400, 0xff7845ff)
+    DrawTile(400, 400, 0xff7845ff)
+    DrawTile(400 + TILE_SIZE - BORDER_SIZE, 400, 0xff7845ff)
     return
