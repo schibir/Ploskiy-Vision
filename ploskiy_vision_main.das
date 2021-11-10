@@ -9,8 +9,8 @@ var player_vertical_vel : float
 var jump_timer : float
 
 let PLAYER_SPEED = 4.0
-let PLAYER_JUMP = 7.3
-let GRAVITY = 5.5
+let PLAYER_JUMP = 7.7
+let GRAVITY = 6.0
 
 def DrawPlayer()
     DrawTile(player[0], player[1], 0xFF869409)
@@ -43,8 +43,9 @@ def act(dt: float)
     player[1] += player_vertical_vel * dt;
     if ((CheckCollision(player) & WALL) == WALL)
         player[1] -= player_vertical_vel * dt
+        if (player_vertical_vel > 0.0)
+            jump_timer = 0.25
         player_vertical_vel = 0.0
-        jump_timer = 0.5
 
     player[0] += horizontal_vel * dt;
     if ((CheckCollision(player) & WALL) == WALL)
