@@ -55,11 +55,11 @@ def DrawLevel()
     let level_dim <- int2(length(current_level), length(current_level[0]))
     for row, y in current_level, range(level_dim[0])
         for cell, x in row, range(level_dim[1])
-            if (cell == WALL)
+            if cell == WALL
                 DrawTile(x, y, 0xFF718B8F)
-            elif (cell == LAVA)
+            elif cell == LAVA
                 DrawTile(x, y, 0xFFCF1A09)
-            elif (cell == EXIT)
+            elif cell == EXIT
                 DrawFrame(x, y, 0xFF672DEE)
 
 def GetTile(x, y: float)

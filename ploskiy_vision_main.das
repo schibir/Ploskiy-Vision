@@ -12,6 +12,7 @@ var rotate_dir : int
 var pivot : float2
 var current_angle : int
 var target_angle : int
+var prev_angle : int
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
@@ -28,7 +29,8 @@ def ResetLevel()
     rotate_dir = 0
     pivot = float2(0.0, 0.0)
     current_angle = 0
-    target_angle = -1
+    target_angle = 0
+    prev_angle = 0
     transform2d_reset()
 
 def DrawPlayer()
@@ -43,14 +45,16 @@ def IsRotating()
 
 def StartRotating(dir: int)
     assert(dir == 1 || dir == -1)
+    if !IsRotating()
+        target_angle = prev_angle + RIGHT_ANGLE * dir
+    elif rotate_dir != dir
+        swap(target_angle, prev_angle)
+
     rotate_dir = dir
-    if (target_angle == -1)
-        target_angle = current_angle + RIGHT_ANGLE * dir
     pivot = player_pos
 
-def StopRotating()
+def CheckForStopRotating()
     rotate_dir = 0
-    target_angle = -1
 
 def RadToAngle(rad: float) : int
     return int(2.0 * rad * float(RIGHT_ANGLE) / PI)
@@ -81,9 +85,11 @@ def act(dt: float)
     if get_key_down(VK_S)
         StartRotating(-1)
 
-    if (IsRotating())
+    if IsRotating()
         PerformRotating(dt)
         return
+
+    prev_angle = current_angle
 
     var horizontal_vel : float
     if get_key(VK_LEFT)
@@ -100,14 +106,14 @@ def act(dt: float)
 
     jump_timer -= dt
     player_pos[1] += player_vertical_vel * dt;
-    if ((CheckCollision(player_pos) & WALL) == WALL)
+    if (CheckCollision(player_pos) & WALL) == WALL
         player_pos[1] -= player_vertical_vel * dt
         if (player_vertical_vel > 0.0)
             jump_timer = JUMP_TIMER
         player_vertical_vel = 0.0
 
     player_pos[0] += horizontal_vel * dt;
-    if ((CheckCollision(player_pos) & WALL) == WALL)
+    if (CheckCollision(player_pos) & WALL) == WALL
         player_pos[0] -= horizontal_vel * dt
 
 // this function will be called every frame after 'act',
