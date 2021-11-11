@@ -8,14 +8,16 @@ var player : float2
 var player_vertical_vel : float
 var jump_timer : float
 var last_move_to_left : bool
-var rotate_vel : float
+var rotate_vel : int
 var pivot : float2
-var current_angle : float
+var current_angle : int
+var target_angle : int
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
 let JUMP_TIMER = 0.25
 let GRAVITY = 6.0
+let RIGHT_ANGLE : int = 10000
 
 def ResetLevel()
     LoadLevel(0)
@@ -23,9 +25,10 @@ def ResetLevel()
     player_vertical_vel = 0.0
     jump_timer = 0.0
     last_move_to_left = false
-    rotate_vel = 0.0
+    rotate_vel = 0
     pivot = float2(0.0, 0.0)
-    current_angle = 0.0
+    current_angle = 0
+    target_angle = 0
     transform2d_reset()
 
 def DrawPlayer()
@@ -36,14 +39,23 @@ def DrawPlayer()
     DrawCircle(player[0] + 2.0 / 3.0 + dx, player[1] + 1.0 / 3.0 + dy, 1.0 / 10.0, 0xffffffff)
 
 def IsRotating()
-    return abs(rotate_vel) > 0.5
+    return rotate_vel != 0
 
-def StartRotating(vel: float)
+def StartRotating(vel: int)
     rotate_vel = vel
     pivot = player
 
 def StopRotating()
-    rotate_vel = 0.0
+    rotate_vel = 0
+
+def RadToAngle(rad: float) : int
+    return int(2.0 * rad * float(RIGHT_ANGLE) / PI)
+
+def AngleToRad(angle: int): float
+    return PI * float(angle) / (2.0 * float(RIGHT_ANGLE))
+
+def PerformRotating(dt: float)
+    current_angle += rotate_vel * RadToAngle(dt)
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
@@ -61,12 +73,12 @@ def act(dt: float)
         ResetLevel()
 
     if get_key_down(VK_W)
-        StartRotating(1.0)
+        StartRotating(1)
     if get_key_down(VK_S)
-        StartRotating(-1.0)
+        StartRotating(-1)
 
     if (IsRotating())
-        current_angle += rotate_vel * dt
+        PerformRotating(dt)
         return
 
     var horizontal_vel : float
@@ -100,7 +112,7 @@ def act(dt: float)
 def draw
     transform2d_reset()
     transform2d_translate(ToScreenSpace(pivot[0] + 0.5), ToScreenSpace(pivot[1] + 0.5))
-    transform2d_rotate(current_angle)
+    transform2d_rotate(AngleToRad(current_angle))
     transform2d_translate(-ToScreenSpace(pivot[0] + 0.5), -ToScreenSpace(pivot[1] + 0.5))
 
     DrawLevel()
