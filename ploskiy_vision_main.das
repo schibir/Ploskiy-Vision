@@ -9,6 +9,8 @@ var player_vertical_vel : float
 var jump_timer : float
 var last_move_to_left : bool
 var rotate_vel : float
+var pivot : float2
+var current_angle : float
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
@@ -22,6 +24,8 @@ def ResetLevel()
     jump_timer = 0.0
     last_move_to_left = false
     rotate_vel = 0.0
+    pivot = float2(0.0, 0.0)
+    current_angle = 0.0
     transform2d_reset()
 
 def DrawPlayer()
@@ -30,6 +34,16 @@ def DrawPlayer()
     let dy = player_vertical_vel * 0.02
     DrawCircle(player[0] + 1.0 / 3.0 + dx, player[1] + 1.0 / 3.0 + dy, 1.0 / 10.0, 0xffffffff)
     DrawCircle(player[0] + 2.0 / 3.0 + dx, player[1] + 1.0 / 3.0 + dy, 1.0 / 10.0, 0xffffffff)
+
+def IsRotating()
+    return abs(rotate_vel) > 0.5
+
+def StartRotating(vel: float)
+    rotate_vel = vel
+    pivot = player
+
+def StopRotating()
+    rotate_vel = 0.0
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
@@ -46,10 +60,14 @@ def act(dt: float)
     if get_key(VK_R)
         ResetLevel()
 
-    if (abs(rotate_vel) > 0.5)
-        transform2d_translate(ToScreenSpace(player[0] + 0.5), ToScreenSpace(player[1] + 0.5))
-        transform2d_rotate(rotate_vel * dt)
-        transform2d_translate(-ToScreenSpace(player[0] + 0.5), -ToScreenSpace(player[1] + 0.5))
+    if get_key_down(VK_W)
+        StartRotating(1.0)
+    if get_key_down(VK_S)
+        StartRotating(-1.0)
+
+    if (IsRotating())
+        current_angle += rotate_vel * dt
+        return
 
     var horizontal_vel : float
     if get_key(VK_LEFT)
@@ -60,8 +78,6 @@ def act(dt: float)
         last_move_to_left = false
     if get_key_down(VK_UP) && jump_timer > 0.0
         player_vertical_vel = -PLAYER_JUMP
-    if get_key_down(VK_W)
-        rotate_vel = 1.0
 
     player_vertical_vel += GRAVITY * dt
     player_vertical_vel = min(player_vertical_vel, PLAYER_JUMP)
@@ -82,6 +98,11 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
+    transform2d_reset()
+    transform2d_translate(ToScreenSpace(pivot[0] + 0.5), ToScreenSpace(pivot[1] + 0.5))
+    transform2d_rotate(current_angle)
+    transform2d_translate(-ToScreenSpace(pivot[0] + 0.5), -ToScreenSpace(pivot[1] + 0.5))
+
     DrawLevel()
     DrawPlayer()
     return
