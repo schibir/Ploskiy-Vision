@@ -13,6 +13,7 @@ var pivot : float2
 var current_angle : int
 var target_angle : int
 var prev_angle : int
+var level_diff : float2
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
@@ -31,13 +32,15 @@ def ResetLevel()
     current_angle = 0
     target_angle = 0
     prev_angle = 0
+    level_diff = float2(0.0, 0.0)
     transform2d_reset()
 
 def Transform()
     transform2d_reset()
-    transform2d_translate(pivot[0], pivot[1])
+    transform2d_translate(level_diff)
+    transform2d_translate(pivot)
     transform2d_rotate(AngleToRad(current_angle))
-    transform2d_translate(-pivot[0], -pivot[1])
+    transform2d_translate(-pivot)
 
 def DrawPlayer()
     DrawTile(player_pos[0], player_pos[1], 0xFF869409)
@@ -53,11 +56,14 @@ def StartRotating(dir: int)
     assert(dir == 1 || dir == -1)
     if !IsRotating()
         target_angle = prev_angle + RIGHT_ANGLE * dir
+        let screen_coord = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
+        transform2d_reset()
+        pivot = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
+        level_diff = screen_coord - pivot
     elif rotate_dir != dir
         swap(target_angle, prev_angle)
 
     rotate_dir = dir
-    pivot = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
 
 def CheckForStopRotating()
     if (abs(current_angle - prev_angle) > RIGHT_ANGLE)
@@ -89,14 +95,14 @@ def act(dt: float)
     if get_key_down(VK_R)
         ResetLevel()
 
+    if IsRotating()
+        PerformRotating(dt)
+        return
+
     if get_key(VK_D)
         StartRotating(1)
     if get_key(VK_A)
         StartRotating(-1)
-
-    if IsRotating()
-        PerformRotating(dt)
-        return
 
     assert(current_angle % RIGHT_ANGLE == 0)
     prev_angle = current_angle
