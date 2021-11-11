@@ -20,6 +20,7 @@ let PLAYER_JUMP = 7.7
 let JUMP_TIMER = 0.25
 let GRAVITY = 6.0
 let RIGHT_ANGLE : int = 10000
+let ROTAION_SPEED = 1.3
 
 def ResetLevel()
     LoadLevel(0)
@@ -68,7 +69,8 @@ def StartRotating(dir: int)
 def CheckForStopRotating()
     if (abs(current_angle - prev_angle) > RIGHT_ANGLE)
         rotate_dir = 0
-        current_angle = target_angle % (4 * RIGHT_ANGLE)
+        current_angle = (target_angle + 4 * RIGHT_ANGLE) % (4 * RIGHT_ANGLE)
+        prev_angle = current_angle
 
 def RadToAngle(rad: float) : int
     return int(2.0 * rad * float(RIGHT_ANGLE) / PI)
@@ -77,7 +79,7 @@ def AngleToRad(angle: int): float
     return PI * float(angle) / (2.0 * float(RIGHT_ANGLE))
 
 def PerformRotating(dt: float)
-    current_angle += rotate_dir * RadToAngle(dt)
+    current_angle += rotate_dir * RadToAngle(dt * ROTAION_SPEED)
     CheckForStopRotating()
 
 // 'initialize' runs once when game starts and every hot-reload
@@ -95,16 +97,17 @@ def act(dt: float)
     if get_key_down(VK_R)
         ResetLevel()
 
-    if IsRotating()
-        PerformRotating(dt)
-        return
-
     if get_key(VK_D)
         StartRotating(1)
     if get_key(VK_A)
         StartRotating(-1)
 
+    if IsRotating()
+        PerformRotating(dt)
+        return
+
     assert(current_angle % RIGHT_ANGLE == 0)
+    assert(current_angle >= 0)
     prev_angle = current_angle
 
     var horizontal_vel : float
@@ -122,17 +125,32 @@ def act(dt: float)
     player_vertical_vel += GRAVITY * dt
     player_vertical_vel = min(player_vertical_vel, PLAYER_JUMP)
 
+    var x_ind = 0
+    var y_ind = 1
+    var x_dir = 1.0
+    var y_dir = 1.0
+
+    if (current_angle / RIGHT_ANGLE == 1)
+        swap(x_ind, y_ind)
+        x_dir = -1.0
+    elif (current_angle / RIGHT_ANGLE == 2)
+        x_dir = -1.0
+        y_dir = -1.0
+    elif (current_angle / RIGHT_ANGLE == 3)
+        swap(x_ind, y_ind)
+        y_dir = -1.0
+
     jump_timer -= dt
-    player_pos[1] += player_vertical_vel * dt;
+    player_pos[y_ind] += player_vertical_vel * dt * y_dir
     if (CheckCollision(player_pos) & WALL) == WALL
-        player_pos[1] -= player_vertical_vel * dt
+        player_pos[y_ind] -= player_vertical_vel * dt * y_dir
         if (player_vertical_vel > 0.0)
             jump_timer = JUMP_TIMER
         player_vertical_vel = 0.0
 
-    player_pos[0] += horizontal_vel * dt;
+    player_pos[x_ind] += horizontal_vel * dt * x_dir
     if (CheckCollision(player_pos) & WALL) == WALL
-        player_pos[0] -= horizontal_vel * dt
+        player_pos[x_ind] -= horizontal_vel * dt * x_dir
 
 // this function will be called every frame after 'act',
 // you can draw anything in this function
