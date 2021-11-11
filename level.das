@@ -8,10 +8,10 @@ let levels_src: array<array<string>> <- [{auto
     "O                        O                O";
     "O                        O                O";
     "O                                         O";
-    "O                X              ~         O";
-    "O                X            OOOOOOO     O";
     "O                X                        O";
-    "O      ~  @                       O       O";
+    "O                X            OOOOOOO     O";
+    "O        O       X                        O";
+    "O      ~ O@                       O       O";
     "O     OOOOOO                      O       O";
     "O                                 O       O";
     "O                                 O       O";
@@ -65,6 +65,10 @@ def DrawLevel()
 def GetTile(x, y: float)
     let int_x = int(x)
     let int_y = int(y)
+    if (int_y < 0 || int_y >= current_level |> length())
+        return EMPTY
+    if (int_x < 0 || int_x >= current_level[0] |> length())
+        return EMPTY
     let tile = current_level[int_y][int_x]
     return tile
 

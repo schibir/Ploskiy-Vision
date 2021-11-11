@@ -33,6 +33,12 @@ def ResetLevel()
     prev_angle = 0
     transform2d_reset()
 
+def Transform()
+    transform2d_reset()
+    transform2d_translate(pivot[0], pivot[1])
+    transform2d_rotate(AngleToRad(current_angle))
+    transform2d_translate(-pivot[0], -pivot[1])
+
 def DrawPlayer()
     DrawTile(player_pos[0], player_pos[1], 0xFF869409)
     let dx = last_move_to_left ? -0.15 : 0.15
@@ -51,10 +57,12 @@ def StartRotating(dir: int)
         swap(target_angle, prev_angle)
 
     rotate_dir = dir
-    pivot = player_pos
+    pivot = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
 
 def CheckForStopRotating()
-    rotate_dir = 0
+    if (abs(current_angle - prev_angle) > RIGHT_ANGLE)
+        rotate_dir = 0
+        current_angle = target_angle % (4 * RIGHT_ANGLE)
 
 def RadToAngle(rad: float) : int
     return int(2.0 * rad * float(RIGHT_ANGLE) / PI)
@@ -64,6 +72,7 @@ def AngleToRad(angle: int): float
 
 def PerformRotating(dt: float)
     current_angle += rotate_dir * RadToAngle(dt)
+    CheckForStopRotating()
 
 // 'initialize' runs once when game starts and every hot-reload
 [export]
@@ -77,18 +86,19 @@ def initialize
 def act(dt: float)
     if get_key(VK_ESCAPE)
         schedule_quit_game()
-    if get_key(VK_R)
+    if get_key_down(VK_R)
         ResetLevel()
 
-    if get_key_down(VK_W)
+    if get_key(VK_D)
         StartRotating(1)
-    if get_key_down(VK_S)
+    if get_key(VK_A)
         StartRotating(-1)
 
     if IsRotating()
         PerformRotating(dt)
         return
 
+    assert(current_angle % RIGHT_ANGLE == 0)
     prev_angle = current_angle
 
     var horizontal_vel : float
@@ -100,6 +110,8 @@ def act(dt: float)
         last_move_to_left = false
     if get_key_down(VK_UP) && jump_timer > 0.0
         player_vertical_vel = -PLAYER_JUMP
+    if get_key_down(VK_DOWN)
+        player_vertical_vel = PLAYER_JUMP
 
     player_vertical_vel += GRAVITY * dt
     player_vertical_vel = min(player_vertical_vel, PLAYER_JUMP)
@@ -120,11 +132,7 @@ def act(dt: float)
 // you can draw anything in this function
 [export]
 def draw
-    transform2d_reset()
-    transform2d_translate(ToScreenSpace(pivot[0] + 0.5), ToScreenSpace(pivot[1] + 0.5))
-    transform2d_rotate(AngleToRad(current_angle))
-    transform2d_translate(-ToScreenSpace(pivot[0] + 0.5), -ToScreenSpace(pivot[1] + 0.5))
-
+    Transform()
     DrawLevel()
     DrawPlayer()
     return
