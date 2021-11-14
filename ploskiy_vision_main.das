@@ -84,6 +84,9 @@ def PerformRotating(dt: float)
     current_angle += rotate_dir * RadToAngle(dt * ROTAION_SPEED)
     CheckForStopRotating()
 
+def GameOver()
+    ResetLevel()
+
 // 'initialize' runs once when game starts and every hot-reload
 [export]
 def initialize
@@ -155,9 +158,18 @@ def act(dt: float)
     if (CheckCollision(player_pos) & WALL) == WALL
         player_pos[x_ind] -= horizontal_vel * dt * x_dir
 
-    if (CheckCollision(player_pos) & ITEM) == ITEM
+    let tile = CheckCollision(player_pos)
+    if (tile & ITEM) == ITEM
         items_left--
         ClearTile(player_pos)
+    elif (tile & LAVA) == LAVA
+        GameOver()
+
+    let screen_coord = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
+    if screen_coord[0] < 0.0 || screen_coord[0] > float(get_screen_width())
+        GameOver()
+    if screen_coord[1] < 0.0 || screen_coord[1] > float(get_screen_height())
+        GameOver()
 
 // this function will be called every frame after 'act',
 // you can draw anything in this function
