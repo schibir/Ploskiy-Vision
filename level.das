@@ -112,13 +112,13 @@ def LoadLevel(level: int)
     current_level <- level_arr
 
     count_items = 0
-    for row in levels_src[level]
+    for row in levels_src[lvl]
         for cell in row
             if ResolveCellChar(cell) == ITEM
                 count_items++
 
-    let y = find_index_if(levels_src[level]) <| $(row) { return find(row, '@') >= 0; }
-    let x = find(levels_src[level][y], '@')
+    let y = find_index_if(levels_src[lvl]) <| $(row) { return find(row, '@') >= 0; }
+    let x = find(levels_src[lvl][y], '@')
     start_pos = int2(x, y)
 
 def DrawLevel(open_exit: bool)
