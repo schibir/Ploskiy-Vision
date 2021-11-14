@@ -14,6 +14,7 @@ var current_angle : int
 var target_angle : int
 var prev_angle : int
 var level_diff : float2
+var items_left : int
 
 let PLAYER_SPEED = 4.0
 let PLAYER_JUMP = 7.7
@@ -34,6 +35,7 @@ def ResetLevel()
     target_angle = 0
     prev_angle = 0
     level_diff = float2(0.0, 0.0)
+    items_left = count_items
     transform2d_reset()
 
 def Transform()
@@ -106,6 +108,7 @@ def act(dt: float)
         PerformRotating(dt)
         return
 
+    assert(items_left >= 0)
     assert(current_angle % RIGHT_ANGLE == 0)
     assert(current_angle >= 0)
     prev_angle = current_angle
@@ -119,7 +122,7 @@ def act(dt: float)
         last_move_to_left = false
     if get_key_down(VK_UP) && jump_timer > 0.0
         player_vertical_vel = -PLAYER_JUMP
-    if get_key_down(VK_DOWN)
+    if get_key(VK_DOWN)
         player_vertical_vel = PLAYER_JUMP
 
     player_vertical_vel += GRAVITY * dt
@@ -152,11 +155,15 @@ def act(dt: float)
     if (CheckCollision(player_pos) & WALL) == WALL
         player_pos[x_ind] -= horizontal_vel * dt * x_dir
 
+    if (CheckCollision(player_pos) & ITEM) == ITEM
+        items_left--
+        ClearTile(player_pos)
+
 // this function will be called every frame after 'act',
 // you can draw anything in this function
 [export]
 def draw
     Transform()
-    DrawLevel()
+    DrawLevel(items_left == 0)
     DrawPlayer()
     return
