@@ -4,6 +4,7 @@ require drawing
 options debugger            // uncomment for debug in VS Code
 require daslib/debug        // uncomment for debug in VS Code
 
+var level_no : int
 var player_pos : float2
 var player_vertical_vel : float
 var jump_timer : float
@@ -21,10 +22,10 @@ let PLAYER_JUMP = 7.7
 let JUMP_TIMER = 0.25
 let GRAVITY = 6.0
 let RIGHT_ANGLE : int = 10000
-let ROTAION_SPEED = 1.3
+let ROTAION_SPEED = 1.7
 
 def ResetLevel()
-    LoadLevel(0)
+    LoadLevel(level_no)
     player_pos = float2(start_pos)
     player_vertical_vel = 0.0
     jump_timer = 0.0
@@ -164,6 +165,9 @@ def act(dt: float)
         ClearTile(player_pos)
     elif (tile & LAVA) == LAVA
         GameOver()
+    elif (tile & EXIT) == EXIT && items_left == 0
+        level_no++
+        ResetLevel()
 
     let screen_coord = world_to_screen(ToScreenSpace(player_pos[0] + 0.5), ToScreenSpace(player_pos[1] + 0.5))
     if screen_coord[0] < 0.0 || screen_coord[0] > float(get_screen_width())
@@ -178,4 +182,8 @@ def draw
     Transform()
     DrawLevel(items_left == 0)
     DrawPlayer()
-    return
+
+    transform2d_push()
+    transform2d_reset()
+    text_out(10, 10, "{count_items - items_left} / {count_items} items taken", 0xFFFFFFFF)
+    transform2d_pop()

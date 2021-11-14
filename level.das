@@ -4,21 +4,75 @@ require drawing
 let levels_src: array<array<string>> <- [{auto
 
 [{auto
-    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO";
-    "O                        O                O";
-    "O                        O                O";
-    "O                                         O";
-    "O                X                        O";
-    "O        .       X            OOOOOOO     O";
-    "O        O       X                        O";
-    "O      ~ O@                       O       O";
-    "O     OOOOOO                      O       O";
-    "O        .                        O       O";
-    "O                                 O       O";
-    "O                                 O       O";
-    "O                                 O       O";
-    "O                                         O";
-    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "             O       O                     ";
+    "             O.     ~O                     ";
+    "             O       O                     ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "     @                                     ";
+    "  OOOOOOOOOOOOOOOOOOOOOO                   ";
+    "                                           ";
+    "                                           ";
+    "                                           "
+}];
+
+[{auto
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "            O           O                  ";
+    "          . O           O.                 ";
+    "            OXXXXXXXXXXXO                  ";
+    "            O           O                  ";
+    "            O     @     O                  ";
+    "                OOOOO                      ";
+    "                  ~                        ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           "
+}];
+
+[{auto
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "            X           X                  ";
+    "          . X           X.                 ";
+    "            X           X                  ";
+    "            X           X                  ";
+    "            X     @     X                  ";
+    "                OOOOO                      ";
+    "                  ~                        ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           "
+}];
+
+[{auto
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "            OOO                            ";
+    "                                           ";
+    "        XXXXXXXXXXXXX                      ";
+    "        X               O.                 ";
+    "       ~X @             O                  ";
+    "        XOOOXXXXXXXXX                      ";
+    "                  .                        ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           ";
+    "                                           "
 }]
 }];
 
@@ -49,7 +103,8 @@ def ResolveCellChar(cell_char: int)
     return val
 
 def LoadLevel(level: int)
-    var level_arr <- [{for row in levels_src[level];
+    let lvl = level % levels_src |> length()
+    var level_arr <- [{for row in levels_src[lvl];
         [{for cell in row;
             ResolveCellChar(cell)
         }]
@@ -71,7 +126,7 @@ def DrawLevel(open_exit: bool)
     for row, y in current_level, range(level_dim[0])
         for cell, x in row, range(level_dim[1])
             if cell == WALL
-                DrawTile(x, y, 0xFF718B8F)
+                DrawTile(x, y, 0xFF3A4A4D)
             elif cell == LAVA
                 DrawTile(x, y, 0xFFFF6551)
             elif cell == EXIT
